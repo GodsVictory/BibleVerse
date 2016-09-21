@@ -3,15 +3,26 @@
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 <script>
 $( document ).ready(function() {
-  var array = [];
-  $.get('verses.txt', function(data) {
-    var verses = data.split('\n');
-    var max = verses.length - 1;
-    var min = 0;
-    var ran = Math.floor(Math.random() * (max - min + 1)) + min;
-    var verse = verses[ran];
-    console.log(verse);
-    $('#verse').text(verse);
+  $.getJSON('verses.json', function(bible) {
+    var max = 66;
+    var min = 1;
+    var book = Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    var max = Object.keys(bible.version[book].book).length;
+    var min = 1;
+    var chapter = Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    var max = Object.keys(bible.version[book].book[chapter].chapter).length;
+    var min = 1;
+    var verse = Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    var chosen = bible.version[book].book[chapter].chapter[verse].verse;
+    var reference = bible.version[book].book_name + " " + chapter + ":" + verse;
+    
+    console.log(chosen);
+    console.log(reference);
+
+    $('#verse').html(chosen + "<br /><br />" + reference);
   });
 });
 </script>
