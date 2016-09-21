@@ -1,0 +1,22 @@
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+<script>
+$( document ).ready(function() {
+  var array = [];
+  $.get('verses.txt', function(data) {
+    var verses = data.split('\n');
+    var max = verses.length - 1;
+    var min = 0;
+    var ran = Math.floor(Math.random() * (max - min + 1)) + min;
+    var verse = verses[ran];
+    console.log(verse);
+    $('#verse').text(verse);
+  });
+});
+</script>
+</head>
+<body style="background-color:black;color:white;font:48px Arial;text-align:center;padding:10px 20% 10px 20%">
+<p id="verse"></p>
+</body>
+</html>
