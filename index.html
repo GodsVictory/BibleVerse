@@ -28,8 +28,9 @@ $( document ).ready(function() {
     $('#verse').html(chosen + "<br /><br />" + reference);
     new Clipboard('#verse', {
       target: function(trigger) {
+        setTimeout(function(){document.getSelection().removeAllRanges();},150);
         $(trigger).css("color", "grey");
-        setTimeout(function(){$(trigger).css("color", "white")},150);
+        setTimeout(function(){$(trigger).css("color", "white")},200);
         return trigger;
       }
     });
