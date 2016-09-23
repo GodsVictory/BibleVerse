@@ -29,6 +29,7 @@ $( document ).ready(function() {
     new Clipboard('#verse', {
       target: function(trigger) {
         $(trigger).css("color", "grey");
+        setTimeout(function(){$(trigger).css("color", "white")},150);
         return trigger;
       }
     });
