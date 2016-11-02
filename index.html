@@ -7,14 +7,35 @@
 <link href='https://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet' type='text/css'>
 <script src="jquery-3.1.0.min.js"></script>
 <script src="clipboard.min.js"></script>
+<script src="qurl.js"></script>
 <script>
+var bible;
 function resize() {
-  if ($(document).ready())
-    $("#verse").css("font-size", ($(document).height() + $(document).width()) * .025);
+  if ($(document).ready()) {
+    $("#verse").css("font-size", ($(window).height() + $(window).width()) * .025 + "px");
+    $("#refresh").css("font-size", ($(window).height() + $(window).width()) * .05 + "px");
+  }
 }
 $(document).ready(function() {
-  $("#verse").css("font-size", ($(document).height() + $(document).width()) * .025);
-  $.getJSON('web.json', function(bible) {
+  $("#verse").css("font-size", ($(window).height() + $(window).width()) * .025);
+  $("#refresh").css("font-size", ($(window).height() + $(window).width()) * .05);
+  $.getJSON('web.json', function(data) {
+    bible = data;
+    getVerse(0);
+  });
+  new Clipboard('#verse', {
+    target: function(trigger) {
+      setTimeout(function(){document.getSelection().removeAllRanges();},150);
+      $(trigger).css("color", "grey");
+      setTimeout(function(){$(trigger).css("color", "white")},200);
+      return trigger;
+    }
+  });
+});
+
+function getVerse(fresh) {
+  var url = Qurl.create();
+  if (fresh) {
     var max = 66;
     var min = 1;
     var book = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -26,24 +47,37 @@ $(document).ready(function() {
     var max = Object.keys(bible.version[book].book[chapter].chapter).length;
     var min = 1;
     var verse = Math.floor(Math.random() * (max - min + 1)) + min;
-    
-    var chosen = bible.version[book].book[chapter].chapter[verse].verse;
-    var reference = bible.version[book].book_name + " " + chapter + ":" + verse;
-    
-    console.log(chosen);
-    console.log(reference);
+  } else {
+    var book = url.query('b');
+    var chapter = url.query('c');
+    var verse = url.query('v');
+    if (!book || !chapter || !verse) {
+      var max = 66;
+      var min = 1;
+      var book = Math.floor(Math.random() * (max - min + 1)) + min;
+      
+      var max = Object.keys(bible.version[book].book).length;
+      var min = 1;
+      var chapter = Math.floor(Math.random() * (max - min + 1)) + min;
+      
+      var max = Object.keys(bible.version[book].book[chapter].chapter).length;
+      var min = 1;
+      var verse = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+  }
+  url.query('b',book);
+  url.query('c',chapter);
+  url.query('v',verse);
+  
+  var chosen = bible.version[book].book[chapter].chapter[verse].verse;
+  var reference = bible.version[book].book_name + " " + chapter + ":" + verse;
+  
+  console.log(chosen);
+  console.log(reference);
 
-    $('#verse').html(chosen + "<br /><br />" + reference);
-    new Clipboard('#verse', {
-      target: function(trigger) {
-        setTimeout(function(){document.getSelection().removeAllRanges();},150);
-        $(trigger).css("color", "grey");
-        setTimeout(function(){$(trigger).css("color", "white")},200);
-        return trigger;
-      }
-    });
-  });
-});
+  $('#verse').html(chosen + "<br /><br />" + reference);
+  $('#refresh').html("&#x21bb;");
+}
 </script>
 <style>
 ::selection {
@@ -58,11 +92,14 @@ body {
   color:white;
   font-family:Fredoka One;
   text-align:center;
-  padding:10px 20% 10px 20%
+  padding:0;
+  margin:0;
 }
 </style>
 </head>
 <body onresize="resize()">
-<p id="verse"></p>
+<p id="verse" style="width:60%;top:0;position:absolute;padding:10px 20% 10px 20%;margin:0;"></p>
+<br /><br /><br />
+<p id="refresh" style="width:100%;bottom:0;position:absolute;padding:0;margin:0;" onclick="getVerse(1)"></p>
 </body>
 </html>
